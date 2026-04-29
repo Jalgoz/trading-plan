@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algo Trading Bot - Guia Interactiva</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --warn: #d29922;
+    --danger: #f85149;
+    --purple: #bc8cff;
+    --phase0: #f97316;
+    --phase1: #3b82f6;
+    --phase2: #8b5cf6;
+    --phase3: #06b6d4;
+    --phase4: #22c55e;
+    --phase5: #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  /* --- HEADER --- */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1e2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(88,166,255,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(63,185,80,0.05) 0%, transparent 50%);
+    animation: pulse 8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+  .hero p { color: var(--text-dim); font-size: 1rem; position: relative; max-width: 600px; margin: 0 auto; }
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    position: relative;
+    flex-wrap: wrap;
+  }
+  .hero-stat {
+    text-align: center;
+  }
+  .hero-stat .val {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .hero-stat .label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  /* --- NAV --- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(15, 17, 23, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+  }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    padding: 0.8rem 1rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  /* --- MAIN --- */
+  .container { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+  .section { display: none; animation: fadeIn 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  /* --- DISCLAIMER --- */
+  .disclaimer {
+    background: linear-gradient(135deg, rgba(248,81,73,0.08), rgba(210,153,34,0.08));
+    border: 1px solid rgba(248,81,73,0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .disclaimer h3 { color: var(--danger); margin-bottom: 0.8rem; font-size: 1rem; }
+  .disclaimer li {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    list-style: none;
+    padding-left: 1.5rem;
+    position: relative;
+  }
+  .disclaimer li::before { content: '!'; position: absolute; left: 0; color: var(--warn); font-weight: 700; }
+  /* --- PHASE CARD --- */
+  .phase-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .phase-header {
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: background 0.2s;
+  }
+  .phase-header:hover { background: rgba(255,255,255,0.02); }
+  .phase-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .phase-header-text { flex: 1; }
+  .phase-header-text h3 { font-size: 1rem; font-weight: 600; }
+  .phase-header-text p { font-size: 0.8rem; color: var(--text-dim); }
+  .phase-chevron {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    transition: transform 0.3s;
+  }
+  .phase-card.open .phase-chevron { transform: rotate(180deg); }
+  .phase-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  .phase-card.open .phase-body { max-height: 5000px; }
+  .phase-content { padding: 0 1.5rem 1.5rem; }
+  /* --- SUB-SECTIONS --- */
+  .sub-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin: 1.2rem 0 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .sub-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  /* --- TASKS --- */
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.5rem 0;
+  }
+  .task input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .task input[type="checkbox"]:checked {
+    background: var(--accent2);
+    border-color: var(--accent2);
+  }
+  .task input[type="checkbox"]:checked::after {
+    content: '\2713';
+    position: absolute;
+    color: #fff;
+    font-size: 12px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .task label {
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .task input:checked + label {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+  /* --- FILE REFS --- */
+  .file-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.2);
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-family: 'Consolas', 'Monaco', monospace;
+    margin: 0.15rem 0;
+    cursor: default;
+    transition: background 0.2s;
+  }
+  .file-ref:hover { background: rgba(88,166,255,0.15); }
+  .file-ref .icon { font-size: 0.9rem; }
+  .file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+  }
+  .file-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    transition: border-color 0.2s;
+  }
+  .file-card:hover { border-color: var(--accent); }
+  .file-card .name {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+  .file-card .desc { font-size: 0.78rem; color: var(--text-dim); }
+  /* --- ERRORS --- */
+  .error-item {
+    background: rgba(248,81,73,0.06);
+    border-left: 3px solid var(--danger);
+    padding: 0.7rem 1rem;
+    margin: 0.4rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .error-item strong { color: var(--danger); font-size: 0.88rem; }
+  .error-item p { color: var(--text-dim); font-size: 0.82rem; margin-top: 0.2rem; }
+  /* --- TOOLS TABLE --- */
+  .tools-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 0.5rem 0;
+  }
+  .tools-table th {
+    text-align: left;
+    padding: 0.5rem 0.8rem;
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  .tools-table td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .tools-table a { color: var(--accent); text-decoration: none; }
+  .tools-table a:hover { text-decoration: underline; }
+  .cost-free {
+    background: rgba(63,185,80,0.15);
+    color: var(--accent2);
+    padding: 0.15rem 0.5rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .cost-paid {
+    background: rgba(210,153,34,0.15);
+    color: var(--warn);
+    padding: 0.15rem 0.5rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  /* --- CODE BLOCK --- */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block code {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.82rem;
+    color: #e6edf3;
+    white-space: pre;
+  }
+  .code-block .lang-tag {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.6rem;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .code-block .copy-btn {
+    position: absolute;
+    top: 0.4rem;
+    right: 3.5rem;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .code-block .copy-btn:hover { background: rgba(255,255,255,0.15); color: var(--text); }
+  /* --- RETURNS TABLE --- */
+  .returns-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+  .returns-table th {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    background: var(--surface2);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+  }
+  .returns-table td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    font-size: 0.88rem;
+  }
+  .returns-table tr:last-child td { border-bottom: none; }
+  .ret-bad { color: var(--danger); }
+  .ret-even { color: var(--text-dim); }
+  .ret-ok { color: var(--accent2); }
+  .ret-good { color: var(--accent); }
+  .ret-fantasy { color: var(--purple); }
+  /* --- TIMELINE --- */
+  .timeline { position: relative; padding-left: 2rem; margin: 1rem 0; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+  .tl-dot {
+    position: absolute;
+    left: -2rem;
+    top: 0.3rem;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    z-index: 1;
+  }
+  .tl-item h4 { font-size: 0.9rem; }
+  .tl-item p { font-size: 0.8rem; color: var(--text-dim); }
+  /* --- ALERTS --- */
+  .alert-card {
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 0.5rem 0;
+  }
+  .alert-card.critical {
+    background: rgba(248,81,73,0.08);
+    border: 1px solid rgba(248,81,73,0.25);
+  }
+  .alert-card.warning {
+    background: rgba(210,153,34,0.08);
+    border: 1px solid rgba(210,153,34,0.25);
+  }
+  .alert-card.good {
+    background: rgba(63,185,80,0.08);
+    border: 1px solid rgba(63,185,80,0.25);
+  }
+  .alert-card h4 { font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .alert-card.critical h4 { color: var(--danger); }
+  .alert-card.warning h4 { color: var(--warn); }
+  .alert-card.good h4 { color: var(--accent2); }
+  .alert-card li {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 0.3rem;
+    list-style: none;
+    padding-left: 1.2rem;
+    position: relative;
+  }
+  .alert-card.critical li::before { content: '\25CF'; position: absolute; left: 0; color: var(--danger); font-size: 0.6rem; top: 0.25rem; }
+  .alert-card.warning li::before { content: '\25CF'; position: absolute; left: 0; color: var(--warn); font-size: 0.6rem; top: 0.25rem; }
+  .alert-card.good li::before { content: '\25CF'; position: absolute; left: 0; color: var(--accent2); font-size: 0.6rem; top: 0.25rem; }
+  /* --- ADVANTAGE --- */
+  .adv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 0.8rem;
+    margin: 1rem 0;
+  }
+  .adv-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .adv-card:hover { border-color: var(--purple); transform: translateY(-2px); }
+  .adv-card .num {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--purple);
+    opacity: 0.4;
+  }
+  .adv-card h4 { font-size: 0.9rem; margin: 0.3rem 0; }
+  .adv-card p { font-size: 0.8rem; color: var(--text-dim); }
+  /* --- PROGRESS BAR --- */
+  .progress-wrap { margin: 1rem 0; }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+  .progress-bar {
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+  /* --- STRUCTURE TREE --- */
+  .tree {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.82rem;
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+  .tree .dir { color: var(--accent); }
+  .tree .file { color: var(--text-dim); }
+  .tree .comment { color: #6e7681; }
+  /* Responsive */
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.5rem; }
+    .hero-stats { gap: 1rem; }
+    .container { padding: 1rem; }
+    .phase-content { padding: 0 1rem 1rem; }
+    .adv-grid { grid-template-columns: 1fr; }
+    .file-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <h1>Algo Trading Bot</h1>
+  <p>Plan de aprendizaje y ejecucion progresivo: Freqtrade + FreqAI + Binance</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="val">6</div><div class="label">Fases</div></div>
+    <div class="hero-stat"><div class="val">~7</div><div class="label">Meses</div></div>
+    <div class="hero-stat"><div class="val">$200</div><div class="label">Capital</div></div>
+    <div class="hero-stat"><div class="val">1-2h</div><div class="label">x dia</div></div>
+  </div>
+</div>
+
+<!-- ===== NAV ===== -->
+<div class="nav">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="showSection('overview')">Inicio</button>
+    <button class="nav-btn" onclick="showSection('phase0')">Fase 0</button>
+    <button class="nav-btn" onclick="showSection('phase1')">Fase 1</button>
+    <button class="nav-btn" onclick="showSection('phase2')">Fase 2</button>
+    <button class="nav-btn" onclick="showSection('phase3')">Fase 3</button>
+    <button class="nav-btn" onclick="showSection('phase4')">Fase 4</button>
+    <button class="nav-btn" onclick="showSection('phase5')">Fase 5</button>
+    <button class="nav-btn" onclick="showSection('returns')">Retornos</button>
+    <button class="nav-btn" onclick="showSection('advantage')">Ventaja</button>
+    <button class="nav-btn" onclick="showSection('alerts')">Alertas</button>
+    <button class="nav-btn" onclick="showSection('files')">Archivos</button>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- =========================================================== -->
+<!--                      OVERVIEW SECTION                       -->
+<!-- =========================================================== -->
+<div class="section active" id="overview">
+
+  <div class="disclaimer">
+    <h3>Disclaimer brutal - Lee esto primero</h3>
+    <ul>
+      <li>Con $200 en spot, un 5% mensual consistente = $10/mes. No vas a vivir de esto al inicio.</li>
+      <li>El 70-90% de traders retail pierden dinero. Un bot no te exime.</li>
+      <li>ML en trading NO es magia. La mayoria de modelos ingenuos pierden vs buy-and-hold.</li>
+      <li>Tu ventaja real es el proceso: backtesting riguroso, gestion de riesgo, disciplina.</li>
+      <li>Tiempo estimado hasta operar con dinero real: 4-6 meses (a 1-2h/dia).</li>
+    </ul>
+  </div>
+
+  <h2 style="margin-bottom: 1rem;">Timeline del plan</h2>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot" style="background: var(--phase0); border-color: var(--phase0);"></div>
+      <h4 style="color: var(--phase0);">Fase 0: Fundamentos de Trading</h4>
+      <p>Semanas 1-3 &middot; 20-40 horas &middot; Estudio, no codigo</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background: var(--phase1); border-color: var(--phase1);"></div>
+      <h4 style="color: var(--phase1);">Fase 1: Freqtrade + Estrategia Simple</h4>
+      <p>Semanas 4-7 &middot; 30-50 horas &middot; Docker, backtest, EmaCrossRsi</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background: var(--phase2); border-color: var(--phase2);"></div>
+      <h4 style="color: var(--phase2);">Fase 2: Fundamentos de ML</h4>
+      <p>Semanas 8-12 &middot; 40-60 horas &middot; LightGBM, walk-forward, features</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background: var(--phase3); border-color: var(--phase3);"></div>
+      <h4 style="color: var(--phase3);">Fase 3: FreqAI Integration</h4>
+      <p>Semanas 13-18 &middot; 50-70 horas &middot; ML dentro de Freqtrade</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background: var(--phase4); border-color: var(--phase4);"></div>
+      <h4 style="color: var(--phase4);">Fase 4: Paper Trading</h4>
+      <p>Semanas 19-24 &middot; 15-25 horas + monitoreo &middot; Minimo 4 semanas</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background: var(--phase5); border-color: var(--phase5);"></div>
+      <h4 style="color: var(--phase5);">Fase 5: Trading Real</h4>
+      <p>Semanas 25-30+ &middot; 15-25 horas + monitoreo &middot; Empezar con $50</p>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Progreso total</span>
+      <span id="total-progress-pct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="total-progress-bar" style="width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent2));"></div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================== -->
+<!--                        FASE 0                               -->
+<!-- =========================================================== -->
+<div class="section" id="phase0">
+  <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1.5rem;">
+    <div class="phase-badge" style="background: rgba(249,115,22,0.15); color: var(--phase0);">0</div>
+    <div>
+      <h2 style="font-size:1.3rem;">Fundamentos de Trading</h2>
+      <p style="color:var(--text-dim); font-size:0.85rem;">Semanas 1-3 &middot; 20-40 horas</p>
+    </div>
+  </div>
+
+  <p style="margin-bottom:1rem; color:var(--text-dim);">Entender como funcionan los mercados crypto, la terminologia, y los mecanismos basicos <strong style="color:var(--warn);">antes de tocar una sola linea de codigo</strong>.</p>
+
+  <div class="sub-title">Tareas</div>
+
+  <div class="task"><input type="checkbox" id="p0t1" onchange="saveProgress()"><label for="p0t1">Estudiar: order book, bid/ask spread, slippage, market vs limit orders</label></div>
+  <div class="task"><input type="checkbox" id="p0t2" onchange="saveProgress()"><label for="p0t2">Estudiar: velas OHLCV, timeframes (1m, 5m, 1h, 1d)</label></div>
+  <div class="task"><input type="checkbox" id="p0t3" onchange="saveProgress()"><label for="p0t3">Estudiar indicadores: RSI, EMA, MACD, Bollinger Bands (que miden, no como tradear)</label></div>
+  <div class="task"><input type="checkbox" id="p0t4" onchange="saveProgress()"><label for="p0t4">Estudiar comisiones Binance (maker/taker 0.1%) e impacto en P&L</label></div>
+  <div class="task"><input type="checkbox" id="p0t5" onchange="saveProgress()"><label for="p0t5">Estudiar: drawdown, sharpe ratio, win rate, profit factor, risk/reward ratio</label></div>
+  <div class="task"><input type="checkbox" id="p0t6" onchange="saveProgress()"><label for="p0t6">Crear cuenta en Binance (SIN depositar dinero)</label></div>
+  <div class="task"><input type="checkbox" id="p0t7" onchange="saveProgress()"><label for="p0t7">Paper trading manual: 10+ trades ficticios en TradingView con analisis</label></div>
+  <div class="task"><input type="checkbox" id="p0t8" onchange="saveProgress()"><label for="p0t8">Calcular breakeven: BTC a $60k con $200, comision 0.1% entry + 0.1% exit</label></div>
+
+  <div class="sub-title">Herramientas</div>
+  <table class="tools-table">
+    <thead><tr><th>Herramienta</th><th>Costo</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://tradingview.com" target="_blank">TradingView</a></td><td><span class="cost-free">Gratis</span></td><td>Graficos, analisis visual</td></tr>
+      <tr><td><a href="https://academy.binance.com" target="_blank">Binance Academy</a></td><td><span class="cost-free">Gratis</span></td><td>Conceptos de trading y crypto</td></tr>
+      <tr><td><a href="https://investopedia.com" target="_blank">Investopedia</a></td><td><span class="cost-free">Gratis</span></td><td>Definiciones y conceptos financieros</td></tr>
+      <tr><td><a href="https://babypips.com" target="_blank">Babypips</a></td><td><span class="cost-free">Gratis</span></td><td>Curso estructurado (School of Pipsology)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sub-title">Errores comunes</div>
+  <div class="error-item"><strong>Saltarte esta fase</strong><p>Sin entender los fundamentos, tu bot sera una caja negra. No puedes evaluar resultados si no sabes que significan.</p></div>
+  <div class="error-item"><strong>Confundir indicadores con estrategias</strong><p>RSI > 70 es un dato, no una estrategia. Una estrategia define entrada, salida, tamanio de posicion y gestion de riesgo.</p></div>
+  <div class="error-item"><strong>Ver YouTube de "traders" que venden cursos</strong><p>La mayoria son charlatanes. Quedate con recursos escritos y verificables.</p></div>
+</div>
+
+<!-- =========================================================== -->
+<!--                        FASE 1                               -->
+<!-- =========================================================== -->
+<div class="section" id="phase1">
+  <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1.5rem;">
+    <div class="phase-badge" style="background: rgba(59,130,246,0.15); color: var(--phase1);">1</div>
+    <div>
+      <h2 style="font-size:1.3rem;">Freqtrade + Estrategia sin ML</h2>
+      <p style="color:var(--text-dim); font-size:0.85rem;">Semanas 4-7 &middot; 30-50 horas</p>
+    </div>
+  </div>
+
+  <p style="margin-bottom:1rem; color:var(--text-dim);">Tener Freqtrade corriendo en Docker, entender su arquitectura, y crear/backtestear la estrategia <span class="file-ref"><span class="icon">&#128196;</span> EmaCrossRsi.py</span></p>
+
+  <div class="sub-title">Archivos del proyecto</div>
+  <div class="file-grid">
+    <div class="file-card"><div class="name">docker-compose.yml</div><div class="desc">Orquestacion Docker: Freqtrade + FreqUI en puerto 8080</div></div>
+    <div class="file-card"><div class="name">config/config-backtest.json</div><div class="desc">5 pares (BTC, ETH, SOL, BNB, XRP), wallet $200, formato feather</div></div>
+    <div class="file-card"><div class="name">strategies/EmaCrossRsi.py</div><div class="desc">EMA 20/50 cross + RSI filter + trailing stop + ROI escalonado</div></div>
+    <div class="file-card"><div class="name">scripts/download_data.ps1</div><div class="desc">Descarga 2 anios de datos OHLCV de 5 pares en 1h y 4h</div></div>
+    <div class="file-card"><div class="name">scripts/backtest.ps1</div><div class="desc">Ejecuta backtest separando TRAIN (2023-jun2024) y TEST (jul2024-2025)</div></div>
+  </div>
+
+  <div class="sub-title">Tareas</div>
+  <div class="task"><input type="checkbox" id="p1t1" onchange="saveProgress()"><label for="p1t1">Freqtrade corre en Docker sin errores (<span class="file-ref"><span class="icon">&#128196;</span> docker-compose.yml</span>)</label></div>
+  <div class="task"><input type="checkbox" id="p1t2" onchange="saveProgress()"><label for="p1t2">Descargar 2 anios de datos OHLCV: <code>.\scripts\download_data.ps1</code></label></div>
+  <div class="task"><input type="checkbox" id="p1t3" onchange="saveProgress()"><label for="p1t3">Leer y entender EmaCrossRsi.py linea por linea</label></div>
+  <div class="task"><input type="checkbox" id="p1t4" onchange="saveProgress()"><label for="p1t4">Ejecutar backtest: <code>.\scripts\backtest.ps1</code></label></div>
+  <div class="task"><input type="checkbox" id="p1t5" onchange="saveProgress()"><label for="p1t5">Profit factor > 1.0 en datos de VALIDACION (test, no train)</label></div>
+  <div class="task"><input type="checkbox" id="p1t6" onchange="saveProgress()"><label for="p1t6">Puedes explicar que es overfitting y como lo mitigas</label></div>
+  <div class="task"><input type="checkbox" id="p1t7" onchange="saveProgress()"><label for="p1t7">Probaste al menos 3 variaciones de parametros y documentaste resultados</label></div>
+
+  <div class="sub-title">Como funciona la estrategia EmaCrossRsi</div>
+  <div class="code-block"><span class="lang-tag">python</span><code># ENTRADA (compra): EMA rapida cruza POR ENCIMA de EMA lenta Y RSI < 70
+(dataframe["ema_fast"] > dataframe["ema_slow"])                    # EMA 20 > EMA 50
+& (dataframe["ema_fast"].shift(1) <= dataframe["ema_slow"].shift(1)) # Cruce reciente
+& (dataframe["rsi"] < 70)                                          # No sobrecompra
+& (dataframe["volume"] > dataframe["volume_mean_20"] * 0.5)        # Hay volumen
+
+# SALIDA (venta): EMA cruza abajo O RSI en sobrecompra extrema
+(dataframe["ema_fast"] < dataframe["ema_slow"])  # Tendencia bajista
+| (dataframe["rsi"] > 80)                        # RSI sobrecompra
+
+# Proteccion: stoploss = -5%, trailing stop, ROI escalonado (8%/4%/2%)</code></div>
+
+  <div class="sub-title">Herramientas</div>
+  <table class="tools-table">
+    <thead><tr><th>Herramienta</th><th>Costo</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://github.com/freqtrade/freqtrade" target="_blank">Freqtrade</a></td><td><span class="cost-free">Gratis</span></td><td>Framework de trading bot (open source)</td></tr>
+      <tr><td>Docker Desktop</td><td><span class="cost-free">Gratis</span></td><td>Ejecucion aislada</td></tr>
+      <tr><td><a href="https://www.freqtrade.io/en/stable/" target="_blank">Freqtrade Docs</a></td><td><span class="cost-free">Gratis</span></td><td>Documentacion oficial</td></tr>
+      <tr><td>FreqUI (incluido)</td><td><span class="cost-free">Gratis</span></td><td>Dashboard web en localhost:8080</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sub-title">Errores comunes</div>
+  <div class="error-item"><strong>Overfitting</strong><p>500% en backtest pero pierde en real. Solucion: siempre separar datos train (70%) y test (30%). El script backtest.ps1 ya lo hace automaticamente.</p></div>
+  <div class="error-item"><strong>Ignorar comisiones en backtest</strong><p>Freqtrade las incluye por defecto (0.1% Binance spot). Verifica en config-backtest.json.</p></div>
+  <div class="error-item"><strong>Optimizar demasiados parametros</strong><p>Con pocos datos y muchos parametros, encontraras algo que "funciona" por casualidad. Empieza simple.</p></div>
+</div>
+
+<!-- =========================================================== -->
+<!--                        FASE 2                               -->
+<!-- =========================================================== -->
+<div class="section" id="phase2">
+  <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1.5rem;">
+    <div class="phase-badge" style="background: rgba(139,92,246,0.15); color: var(--phase2);">2</div>
+    <div>
+      <h2 style="font-size:1.3rem;">Fundamentos de ML</h2>
+      <p style="color:var(--text-dim); font-size:0.85rem;">Semanas 8-12 &middot; 40-60 horas</p>
+    </div>
+  </div>
+
+  <p style="margin-bottom:1rem; color:var(--text-dim);">Aprender Machine Learning suficiente para usarlo con criterio. No necesitas un master, pero si entender que hace y que <strong style="color:var(--warn);">NO</strong> hace.</p>
+
+  <div class="sub-title">Archivos del proyecto</div>
+  <div class="file-grid">
+    <div class="file-card"><div class="name">notebooks/ml_fundamentals.ipynb</div><div class="desc">Notebook guiado: features, LightGBM, walk-forward, P&L simulado. 7 secciones completas.</div></div>
+  </div>
+
+  <div class="sub-title">Tareas</div>
+  <div class="task"><input type="checkbox" id="p2t1" onchange="saveProgress()"><label for="p2t1">Completar curso de ML: <a href="https://course.fast.ai/" target="_blank" style="color:var(--accent);">fast.ai</a> o <a href="https://www.kaggle.com/learn/intro-to-machine-learning" target="_blank" style="color:var(--accent);">Kaggle Learn</a></label></div>
+  <div class="task"><input type="checkbox" id="p2t2" onchange="saveProgress()"><label for="p2t2">Entender: train/test/validation split (y por que NO random en series temporales)</label></div>
+  <div class="task"><input type="checkbox" id="p2t3" onchange="saveProgress()"><label for="p2t3">Entender: feature engineering - que features usar, cuales evitar</label></div>
+  <div class="task"><input type="checkbox" id="p2t4" onchange="saveProgress()"><label for="p2t4">Entender: metricas (accuracy, precision, recall) y por que accuracy no basta</label></div>
+  <div class="task"><input type="checkbox" id="p2t5" onchange="saveProgress()"><label for="p2t5">Completar el notebook <span class="file-ref"><span class="icon">&#128196;</span> ml_fundamentals.ipynb</span> completo</label></div>
+  <div class="task"><input type="checkbox" id="p2t6" onchange="saveProgress()"><label for="p2t6">Entrenar LightGBM con walk-forward (TimeSeriesSplit) - NO random split</label></div>
+  <div class="task"><input type="checkbox" id="p2t7" onchange="saveProgress()"><label for="p2t7">Aceptar que ~50% accuracy es normal y predecir precios es MUY dificil</label></div>
+
+  <div class="sub-title">Que hay en el notebook</div>
+  <div class="code-block"><span class="lang-tag">contenido</span><code>1. Cargar datos OHLCV (reales o sinteticos)
+2. Feature Engineering: retornos, EMAs, RSI, volatilidad, volumen relativo
+3. Definir target: "sube >1% en 4 velas?"
+4. Walk-Forward Split con TimeSeriesSplit (NUNCA random)
+5. Entrenar LightGBM y evaluar por fold
+6. Feature Importance: que features importan realmente
+7. Simulacion P&L: convertir predicciones en ganancias/perdidas</code></div>
+
+  <div class="sub-title">Errores comunes</div>
+  <div class="error-item"><strong>Lookahead bias</strong><p>Usar datos del futuro para predecir el pasado sin darte cuenta. El error mas insidioso en ML para trading.</p></div>
+  <div class="error-item"><strong>Random split en series temporales</strong><p>NUNCA. Siempre walk-forward. El notebook usa TimeSeriesSplit correctamente.</p></div>
+  <div class="error-item"><strong>Usar precio absoluto como feature</strong><p>Los precios no generalizan. Usa retornos, ratios, indicadores normalizados. El notebook ya lo hace asi.</p></div>
+</div>
+
+<!-- =========================================================== -->
+<!--                        FASE 3                               -->
+<!-- =========================================================== -->
+<div class="section" id="phase3">
+  <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1.5rem;">
+    <div class="phase-badge" style="background: rgba(6,182,212,0.15); color: var(--phase3);">3</div>
+    <div>
+      <h2 style="font-size:1.3rem;">FreqAI - ML Integrado</h2>
+      <p style="color:var(--text-dim); font-size:0.85rem;">Semanas 13-18 &middot; 50-70 horas</p>
+    </div>
+  </div>
+
+  <p style="margin-bottom:1rem; color:var(--text-dim);">Integrar modelos ML en Freqtrade usando FreqAI. Pipeline completo: features &rarr; training &rarr; prediction &rarr; signal.</p>
+
+  <div class="sub-title">Archivos del proyecto</div>
+  <div class="file-grid">
+    <div class="file-card"><div class="name">strategies/FreqaiLightgbm.py</div><div class="desc">Estrategia ML: 6 features expandibles, target a 4 velas, umbral de confianza 60%</div></div>
+    <div class="file-card"><div class="name">config/config-backtest-freqai.json</div><div class="desc">Config FreqAI: train=90 dias, retrain cada 7 dias, SVM outliers, LightGBM params</div></div>
+    <div class="file-card"><div class="name">scripts/backtest_freqai.ps1</div><div class="desc">Ejecuta backtest con FreqAI (30-60 min). Usa LightGBMClassifier.</div></div>
+  </div>
+
+  <div class="sub-title">Tareas</div>
+  <div class="task"><input type="checkbox" id="p3t1" onchange="saveProgress()"><label for="p3t1">Leer documentacion <a href="https://www.freqtrade.io/en/stable/freqai/" target="_blank" style="color:var(--accent);">FreqAI</a> completa</label></div>
+  <div class="task"><input type="checkbox" id="p3t2" onchange="saveProgress()"><label for="p3t2">FreqAI corre backtest sin errores: <code>.\scripts\backtest_freqai.ps1</code></label></div>
+  <div class="task"><input type="checkbox" id="p3t3" onchange="saveProgress()"><label for="p3t3">Probaste al menos 2 configuraciones de features/targets distintas</label></div>
+  <div class="task"><input type="checkbox" id="p3t4" onchange="saveProgress()"><label for="p3t4">Resultados positivos en datos de validacion</label></div>
+  <div class="task"><input type="checkbox" id="p3t5" onchange="saveProgress()"><label for="p3t5">Comparado ML vs EmaCrossRsi simple y documentado cual gana</label></div>
+  <div class="task"><input type="checkbox" id="p3t6" onchange="saveProgress()"><label for="p3t6">Puedes explicar: features &rarr; training &rarr; prediction &rarr; signal</label></div>
+
+  <div class="sub-title">Pipeline FreqAI en tu estrategia</div>
+  <div class="code-block"><span class="lang-tag">pipeline</span><code>FreqaiLightgbm.py:
+  feature_engineering_expand_all()  &rarr; 6 features x 3 periodos (10,20,50) = 18 features
+  feature_engineering_expand_basic() &rarr; 5 features extra (hora, dia, retorno, etc)
+  set_freqai_targets()              &rarr; target: sube >1% en 4 velas?
+
+config-backtest-freqai.json:
+  train_period_days: 90      &rarr; Entrena con 90 dias de datos
+  backtest_period_days: 7    &rarr; Valida cada 7 dias
+  live_retrain_period: 7     &rarr; Re-entrena cada 7 dias en vivo
+  DI_threshold: 0.9          &rarr; Filtra datos muy diferentes al training
+  use_SVM_to_remove_outliers &rarr; Limpia outliers antes de entrenar</code></div>
+
+  <div class="sub-title">Errores comunes</div>
+  <div class="error-item"><strong>Demasiadas features</strong><p>Empieza con 5-10 features. Mas features != mejor modelo con pocos datos.</p></div>
+  <div class="error-item"><strong>No comparar contra baseline</strong><p>Si tu ML no supera EmaCrossRsi simple, no vale la complejidad extra.</p></div>
+  <div class="error-item"><strong>Target demasiado ruidoso</strong><p>"Sube o baja en la siguiente vela?" tiene mucho ruido. Usa horizontes mas largos (4-10 velas).</p></div>
+</div>
+
+<!-- =========================================================== -->
+<!--                        FASE 4                               -->
+<!-- =========================================================== -->
+<div class="section" id="phase4">
+  <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1.5rem;">
+    <div class="phase-badge" style="background: rgba(34,197,94,0.15); color: var(--phase4);">4</div>
+    <div>
+      <h2 style="font-size:1.3rem;">Paper Trading</h2>
+      <p style="color:var(--text-dim); font-size:0.85rem;">Semanas 19-24 &middot; 4+ semanas obligatorias</p>
+    </div>
+  </div>
+
+  <p style="margin-bottom:1rem; color:var(--text-dim);"><strong style="color:var(--danger);">No negociable: NO poner dinero real hasta completar esta fase.</strong> Minimo 4 semanas de dry-run con datos de mercado reales.</p>
+
+  <div class="sub-title">Archivos del proyecto</div>
+  <div class="file-grid">
+    <div class="file-card"><div class="name">config/config-dryrun.json</div><div class="desc">dry_run: true, wallet $200, stake $20/trade, API server en :8080, max 3 trades</div></div>
+    <div class="file-card"><div class="name">scripts/dryrun.ps1</div><div class="desc">Inicia paper trading. FreqUI en http://localhost:8080</div></div>
+    <div class="file-card"><div class="name">progress/journal.md</div><div class="desc">Diario de trading con plantilla para cada trade y sesion</div></div>
+  </div>
+
+  <div class="sub-title">Tareas</div>
+  <div class="task"><input type="checkbox" id="p4t1" onchange="saveProgress()"><label for="p4t1">Bot corriendo en dry-run 24/7: <code>.\scripts\dryrun.ps1</code></label></div>
+  <div class="task"><input type="checkbox" id="p4t2" onchange="saveProgress()"><label for="p4t2">Semana 1 completada y documentada en journal.md</label></div>
+  <div class="task"><input type="checkbox" id="p4t3" onchange="saveProgress()"><label for="p4t3">Semana 2 completada</label></div>
+  <div class="task"><input type="checkbox" id="p4t4" onchange="saveProgress()"><label for="p4t4">Semana 3 completada</label></div>
+  <div class="task"><input type="checkbox" id="p4t5" onchange="saveProgress()"><label for="p4t5">Semana 4 completada</label></div>
+  <div class="task"><input type="checkbox" id="p4t6" onchange="saveProgress()"><label for="p4t6">Rendimiento paper dentro del rango del backtest (+-30%)</label></div>
+  <div class="task"><input type="checkbox" id="p4t7" onchange="saveProgress()"><label for="p4t7">Drawdown maximo no supera 15-20%</label></div>
+  <div class="task"><input type="checkbox" id="p4t8" onchange="saveProgress()"><label for="p4t8">NO modifique la estrategia durante el paper (invalida la prueba)</label></div>
+  <div class="task"><input type="checkbox" id="p4t9" onchange="saveProgress()"><label for="p4t9">Diario con 20+ trades documentados</label></div>
+
+  <div class="sub-title">Errores comunes</div>
+  <div class="error-item"><strong>Paper trading solo 1 semana</strong><p>4 semanas MINIMO. Los mercados tienen ciclos. Necesitas ver tu bot en distintas condiciones.</p></div>
+  <div class="error-item"><strong>Ignorar divergencias backtest vs paper</strong><p>Si backtest = +10% y paper = -5%, hay bug o overfitting. No racionalices, investiga.</p></div>
+</div>
+
+<!-- =========================================================== -->
+<!--                        FASE 5                               -->
+<!-- =========================================================== -->
+<div class="section" id="phase5">
+  <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1.5rem;">
+    <div class="phase-badge" style="background: rgba(239,68,68,0.15); color: var(--phase5);">5</div>
+    <div>
+      <h2 style="font-size:1.3rem;">Trading Real</h2>
+      <p style="color:var(--text-dim); font-size:0.85rem;">Semanas 25-30+ &middot; Micro-capital</p>
+    </div>
+  </div>
+
+  <div class="disclaimer" style="margin-bottom:1.5rem;">
+    <h3>DINERO REAL</h3>
+    <ul>
+      <li>Empieza con $50, NO $200. Si funciona 4 semanas, sube a $100.</li>
+      <li>API keys solo con permisos de trading, NUNCA de retiro.</li>
+      <li>Si pierdes >15%, PARAR y regresar a Fase 3 o 4.</li>
+    </ul>
+  </div>
+
+  <div class="sub-title">Archivos del proyecto</div>
+  <div class="file-grid">
+    <div class="file-card"><div class="name">config/config-live.example.json</div><div class="desc">Template: copiar como config-live.json y agregar API keys. Incluye protecciones CooldownPeriod y StoplossGuard.</div></div>
+    <div class="file-card"><div class="name">scripts/live.ps1</div><div class="desc">Requiere escribir "CONFIRMO". Verifica que config-live.json exista.</div></div>
+  </div>
+
+  <div class="sub-title">Tareas</div>
+  <div class="task"><input type="checkbox" id="p5t1" onchange="saveProgress()"><label for="p5t1">Copiar config-live.example.json &rarr; config-live.json y configurar API keys</label></div>
+  <div class="task"><input type="checkbox" id="p5t2" onchange="saveProgress()"><label for="p5t2">Depositar $50 en Binance (NO $200)</label></div>
+  <div class="task"><input type="checkbox" id="p5t3" onchange="saveProgress()"><label for="p5t3">Semana 1 real completada</label></div>
+  <div class="task"><input type="checkbox" id="p5t4" onchange="saveProgress()"><label for="p5t4">Semana 2 real completada</label></div>
+  <div class="task"><input type="checkbox" id="p5t5" onchange="saveProgress()"><label for="p5t5">Semana 3 real completada</label></div>
+  <div class="task"><input type="checkbox" id="p5t6" onchange="saveProgress()"><label for="p5t6">Semana 4 real completada</label></div>
+  <div class="task"><input type="checkbox" id="p5t7" onchange="saveProgress()"><label for="p5t7">Capital no ha caido mas del 15%</label></div>
+  <div class="task"><input type="checkbox" id="p5t8" onchange="saveProgress()"><label for="p5t8">Resultados reales dentro del rango del paper trading</label></div>
+  <div class="task"><input type="checkbox" id="p5t9" onchange="saveProgress()"><label for="p5t9">Decision: escalar a $100 / iterar estrategia / parar</label></div>
+
+  <div class="sub-title">Comandos</div>
+  <div class="code-block"><span class="lang-tag">powershell</span><code># 1. Copiar template de config
+copy config\config-live.example.json config\config-live.json
+
+# 2. Editar config-live.json: agregar API keys, cambiar passwords
+
+# 3. Iniciar trading real (requiere confirmacion)
+.\scripts\live.ps1
+
+# 4. Configurar alertas Telegram (opcional pero recomendado)
+# Editar "telegram" block en config-live.json</code></div>
+</div>
+
+<!-- =========================================================== -->
+<!--                      RETURNS SECTION                        -->
+<!-- =========================================================== -->
+<div class="section" id="returns">
+  <h2 style="margin-bottom: 1rem;">Retornos realistas (% mensual)</h2>
+  <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Se brutalmente honesto contigo mismo al leer esto.</p>
+
+  <table class="returns-table">
+    <thead><tr><th>Escenario</th><th>Retorno mensual</th><th>Contexto</th></tr></thead>
+    <tbody>
+      <tr><td class="ret-bad">Malo pero comun</td><td class="ret-bad">-5% a -15%</td><td>La mayoria de bots retail. Overfitting o mal risk management.</td></tr>
+      <tr><td class="ret-even">Breakeven</td><td class="ret-even">-2% a +2%</td><td>Despues de comisiones. Muchos bots "rentables" en backtest terminan aqui.</td></tr>
+      <tr><td class="ret-ok">Decente</td><td class="ret-ok">+2% a +5%</td><td>Consistente en 6+ meses. Esto ya es MUY bueno para retail.</td></tr>
+      <tr><td class="ret-good">Muy bueno</td><td class="ret-good">+5% a +10%</td><td>Posible en periodos de alta volatilidad. No esperes esto cada mes.</td></tr>
+      <tr><td class="ret-fantasy">Fantasia</td><td class="ret-fantasy">+20%+ mensual</td><td>Si alguien te lo promete, es estafa o survivorship bias.</td></tr>
+    </tbody>
+  </table>
+
+  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; margin-top: 1.5rem;">
+    <p style="font-size: 0.95rem;"><strong>Con $200 USD y +3% mensual:</strong></p>
+    <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 0.3rem;">Ganas ~$6/mes. No es para vivir de esto al inicio. Es para <strong style="color: var(--accent);">aprender, validar, y escalar</strong> con mas capital si demuestras que funciona.</p>
+  </div>
+</div>
+
+<!-- =========================================================== -->
+<!--                    ADVANTAGE SECTION                        -->
+<!-- =========================================================== -->
+<div class="section" id="advantage">
+  <h2 style="margin-bottom: 1rem;">Tu ventaja como ingeniero en sistemas</h2>
+  <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Lo que puedes hacer tu que el "trader promedio" no puede.</p>
+
+  <div class="adv-grid">
+    <div class="adv-card">
+      <div class="num">01</div>
+      <h4>Infraestructura robusta</h4>
+      <p>Docker, CI/CD, monitoring, logging. Tu bot no se cae sin que te enteres. Health checks y alertas automatizadas.</p>
+    </div>
+    <div class="adv-card">
+      <div class="num">02</div>
+      <h4>Pipeline de datos propio</h4>
+      <p>Scraping on-chain, sentiment de redes sociales, datos de exchanges. Freqtrade permite features custom.</p>
+    </div>
+    <div class="adv-card">
+      <div class="num">03</div>
+      <h4>Testing riguroso</h4>
+      <p>Unit tests para estrategia, integration tests para pipeline, validacion estadistica automatizada.</p>
+    </div>
+    <div class="adv-card">
+      <div class="num">04</div>
+      <h4>Feature engineering creativo</h4>
+      <p>Funding rates, open interest, liquidation maps, on-chain metrics via APIs que la mayoria no usa.</p>
+    </div>
+    <div class="adv-card">
+      <div class="num">05</div>
+      <h4>Versionamiento</h4>
+      <p>Git para estrategias, MLflow para rastrear experimentos. Reproducibilidad total de resultados.</p>
+    </div>
+    <div class="adv-card">
+      <div class="num">06</div>
+      <h4>Multi-strategy</h4>
+      <p>Correr multiples estrategias en paralelo, diversificar, medir correlacion entre ellas.</p>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================== -->
+<!--                      ALERTS SECTION                         -->
+<!-- =========================================================== -->
+<div class="section" id="alerts">
+  <h2 style="margin-bottom: 1rem;">Seniales de alerta</h2>
+  <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Como saber si estas fallando sin darte cuenta.</p>
+
+  <div class="alert-card critical">
+    <h4>Criticas - PARAR y reevaluar</h4>
+    <ul>
+      <li>Tu backtest da >30% mensual. Casi seguro overfitting.</li>
+      <li>Tu estrategia solo funciona en un par o un periodo. Es curve-fitted.</li>
+      <li>Resultados de paper trading son muy diferentes al backtest. Bug o lookahead bias.</li>
+      <li>Estas "ajustando" la estrategia cada vez que pierde. Optimizacion emocional.</li>
+      <li>Llevas mas de 8 semanas sin completar una fase. Replantea el scope.</li>
+    </ul>
+  </div>
+
+  <div class="alert-card warning">
+    <h4>Precaucion</h4>
+    <ul>
+      <li>No estas documentando nada. Sin registros no puedes evaluar progreso.</li>
+      <li>Agregando complejidad sin mejorar metricas. Mas features, mismo sharpe. Simplifica.</li>
+      <li>Solo pruebas en BTC/USDT. Valida en 3-5 pares minimo.</li>
+      <li>Ignoras comisiones o slippage. Con micro-capital se comen tus ganancias.</li>
+      <li>Comparandote con gente en Twitter que "hace 50% mensual". Survivorship bias.</li>
+    </ul>
+  </div>
+
+  <div class="alert-card good">
+    <h4>Vas bien si...</h4>
+    <ul>
+      <li>Backtest y paper trading convergen (diferencia menor a 30%)</li>
+      <li>Sharpe ratio > 1.0 en datos de validacion</li>
+      <li>Drawdown maximo menor a 20%</li>
+      <li>Puedes explicar cada componente de tu pipeline</li>
+      <li>Llevas un diario y articulas que aprendiste cada semana</li>
+    </ul>
+  </div>
+</div>
+
+<!-- =========================================================== -->
+<!--                     FILES SECTION                           -->
+<!-- =========================================================== -->
+<div class="section" id="files">
+  <h2 style="margin-bottom: 1rem;">Estructura del proyecto</h2>
+  <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Todos los archivos que ya tienes listos.</p>
+
+  <div class="tree">
+<span class="dir">algo-trading-bot/</span>
+  <span class="file">README.md</span>                           <span class="comment"># Guia rapida de uso</span>
+  <span class="file">.gitignore</span>                          <span class="comment"># Excluye API keys y datos</span>
+  <span class="file">docker-compose.yml</span>                  <span class="comment"># Freqtrade + FreqUI en Docker</span>
+  <span class="file">plan.md</span>                             <span class="comment"># Plan completo en markdown</span>
+  <span class="file">guia.html</span>                           <span class="comment"># Esta guia interactiva</span>
+  <span class="dir">config/</span>
+    <span class="file">config-backtest.json</span>              <span class="comment"># Backtest estrategia simple (5 pares)</span>
+    <span class="file">config-backtest-freqai.json</span>       <span class="comment"># Backtest ML con FreqAI + LightGBM</span>
+    <span class="file">config-dryrun.json</span>                <span class="comment"># Paper trading + FreqUI en :8080</span>
+    <span class="file">config-live.example.json</span>          <span class="comment"># Template para trading real</span>
+  <span class="dir">strategies/</span>
+    <span class="file">EmaCrossRsi.py</span>                    <span class="comment"># Fase 1: EMA 20/50 + RSI + trailing</span>
+    <span class="file">FreqaiLightgbm.py</span>                 <span class="comment"># Fase 3: FreqAI + LightGBM classifier</span>
+  <span class="dir">notebooks/</span>
+    <span class="file">ml_fundamentals.ipynb</span>             <span class="comment"># Fase 2: ML desde cero (7 secciones)</span>
+  <span class="dir">scripts/</span>
+    <span class="file">download_data.ps1</span>                 <span class="comment"># Descarga 2 anios, 5 pares, 1h+4h</span>
+    <span class="file">backtest.ps1</span>                      <span class="comment"># Backtest con train/test split</span>
+    <span class="file">backtest_freqai.ps1</span>               <span class="comment"># Backtest FreqAI (30-60 min)</span>
+    <span class="file">dryrun.ps1</span>                        <span class="comment"># Paper trading 24/7</span>
+    <span class="file">live.ps1</span>                          <span class="comment"># Trading real (pide confirmacion)</span>
+  <span class="dir">progress/</span>
+    <span class="file">tracker.md</span>                        <span class="comment"># Checklist por fase con tablas</span>
+    <span class="file">journal.md</span>                        <span class="comment"># Diario de trading</span>
+  <span class="dir">user_data/</span>                          <span class="comment"># Creado por Freqtrade al iniciar</span>
+  </div>
+
+  <div class="sub-title" style="margin-top:1.5rem;">Guia rapida de comandos</div>
+  <div class="code-block"><span class="lang-tag">powershell</span><code># FASE 1: Setup inicial
+docker compose run --rm freqtrade create-userdir --userdir /freqtrade/user_data
+.\scripts\download_data.ps1
+.\scripts\backtest.ps1
+
+# FASE 3: Backtest con ML
+.\scripts\backtest_freqai.ps1
+
+# FASE 4: Paper trading
+.\scripts\dryrun.ps1
+# Abrir http://localhost:8080 (user: freqtrade, pass: freqtrade)
+
+# FASE 5: Trading real
+copy config\config-live.example.json config\config-live.json
+# Editar config-live.json con API keys
+.\scripts\live.ps1</code></div>
+</div>
+
+</div><!-- /container -->
+
+<div style="text-align:center; padding: 2rem; color: var(--text-dim); font-size: 0.75rem; border-top: 1px solid var(--border); margin-top: 2rem;">
+  Algo Trading Bot &middot; Freqtrade + FreqAI &middot; Binance Spot &middot; Plan progresivo
+</div>
+
+<script>
+// Navigation
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Phase card toggle
+document.querySelectorAll('.phase-header').forEach(h => {
+  h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+});
+
+// Progress persistence with localStorage
+function saveProgress() {
+  const checks = {};
+  document.querySelectorAll('.task input[type="checkbox"]').forEach(cb => {
+    checks[cb.id] = cb.checked;
+  });
+  localStorage.setItem('algo-trading-progress', JSON.stringify(checks));
+  updateProgressBar();
+}
+
+function loadProgress() {
+  const saved = localStorage.getItem('algo-trading-progress');
+  if (saved) {
+    const checks = JSON.parse(saved);
+    Object.entries(checks).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el) el.checked = val;
+    });
+  }
+  updateProgressBar();
+}
+
+function updateProgressBar() {
+  const all = document.querySelectorAll('.task input[type="checkbox"]');
+  const checked = document.querySelectorAll('.task input[type="checkbox"]:checked');
+  const pct = all.length > 0 ? Math.round((checked.length / all.length) * 100) : 0;
+  const bar = document.getElementById('total-progress-bar');
+  const label = document.getElementById('total-progress-pct');
+  if (bar) bar.style.width = pct + '%';
+  if (label) label.textContent = pct + '%';
+}
+
+// Copy button for code blocks
+document.querySelectorAll('.code-block').forEach(block => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copiar';
+  btn.addEventListener('click', () => {
+    const code = block.querySelector('code').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'Copiado!';
+      setTimeout(() => btn.textContent = 'Copiar', 1500);
+    });
+  });
+  block.appendChild(btn);
+});
+
+// Init
+loadProgress();
+</script>
+</body>
+</html>

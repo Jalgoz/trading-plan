@@ -1,0 +1,27 @@
+# API keys - NEVER commit
+config/config-live.json
+
+# Freqtrade generated data
+user_data/data/
+user_data/models/
+user_data/logs/
+user_data/backtest_results/
+user_data/plot/
+user_data/hyperopt_results/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log

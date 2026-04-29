@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  freqtrade:
+    image: freqtradeorg/freqtrade:stable
+    container_name: freqtrade-bot
+    restart: unless-stopped
+    volumes:
+      - ./user_data:/freqtrade/user_data
+      - ./config:/freqtrade/config
+      - ./strategies:/freqtrade/user_data/strategies
+    ports:
+      - "8080:8080"
+    command: >
+      trade
+      --config /freqtrade/config/config-dryrun.json
+      --strategy EmaCrossRsi

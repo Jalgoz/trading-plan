@@ -1,0 +1,95 @@
+{
+    "_comment": "COPIA este archivo como config-live.json y agrega tus API keys. config-live.json está en .gitignore.",
+    "trading_mode": "spot",
+    "margin_mode": "",
+    "max_open_trades": 2,
+    "stake_currency": "USDT",
+    "stake_amount": 20,
+    "tradable_balance_ratio": 0.99,
+    "fiat_display_currency": "USD",
+    "dry_run": false,
+    "cancel_open_orders_on_exit": true,
+    "unfilledtimeout": {
+        "entry": 10,
+        "exit": 10,
+        "exit_timeout_count": 0,
+        "unit": "minutes"
+    },
+    "entry_pricing": {
+        "price_side": "same",
+        "use_order_book": true,
+        "order_book_top": 1,
+        "price_last_balance": 0.0,
+        "check_depth_of_market": {
+            "enabled": false,
+            "bids_to_ask_delta": 1
+        }
+    },
+    "exit_pricing": {
+        "price_side": "same",
+        "use_order_book": true,
+        "order_book_top": 1
+    },
+    "exchange": {
+        "name": "binance",
+        "key": "TU_API_KEY_AQUI",
+        "secret": "TU_API_SECRET_AQUI",
+        "ccxt_config": {},
+        "ccxt_sync_config": {},
+        "pair_whitelist": [
+            "BTC/USDT",
+            "ETH/USDT",
+            "SOL/USDT"
+        ],
+        "pair_blacklist": []
+    },
+    "pairlists": [
+        {
+            "method": "StaticPairList"
+        }
+    ],
+    "telegram": {
+        "enabled": false,
+        "token": "TU_TELEGRAM_BOT_TOKEN",
+        "chat_id": "TU_CHAT_ID",
+        "notification_settings": {
+            "status": "silent",
+            "warning": "on",
+            "startup": "on",
+            "entry": "on",
+            "exit": "on"
+        }
+    },
+    "api_server": {
+        "enabled": true,
+        "listen_ip_address": "0.0.0.0",
+        "listen_port": 8080,
+        "verbosity": "error",
+        "enable_openapi": false,
+        "jwt_secret_key": "CAMBIA-ESTO-A-UN-STRING-ALEATORIO",
+        "ws_token": "CAMBIA-ESTO-WS-TOKEN",
+        "CORS_origins": [],
+        "username": "freqtrade",
+        "password": "CAMBIA-ESTE-PASSWORD"
+    },
+    "bot_name": "algo-bot-live",
+    "initial_state": "stopped",
+    "force_entry_enable": false,
+    "internals": {
+        "process_throttle_secs": 5
+    },
+    "protections": [
+        {
+            "method": "CooldownPeriod",
+            "stop_duration_candles": 2
+        },
+        {
+            "method": "StoplossGuard",
+            "trade_limit": 3,
+            "lookback_period_candles": 24,
+            "stop_duration_candles": 12
+        }
+    ],
+    "dataformat_ohlcv": "feather",
+    "dataformat_trades": "feather"
+}
