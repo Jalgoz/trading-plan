@@ -1,5 +1,8 @@
 # API keys - NEVER commit
 config/config-live.json
+.env
+*.env
+secrets.json
 
 # Freqtrade generated data
 user_data/data/
@@ -25,3 +28,7 @@ Thumbs.db
 
 # Docker
 *.log
+
+# Databases
+*.sqlite
+*.db

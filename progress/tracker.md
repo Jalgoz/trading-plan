@@ -24,22 +24,24 @@ Recursos usados:
 ## FASE 1: Freqtrade + Estrategia sin ML (Semanas 4-7)
 
 - [ ] Freqtrade corre en Docker sin errores
-- [ ] Descargados 2 anios de datos OHLCV de 5 pares
-- [ ] Lei y entendi la SampleStrategy linea por linea
+- [ ] Descargados 2 anios de datos OHLCV de pares principales
+- [ ] Lei y entendi EmaCrossRsi.py linea por linea
 - [ ] Mi estrategia EmaCrossRsi compila y ejecuta backtest
-- [ ] Backtest en periodo TRAIN muestra profit factor > 1.0
-- [ ] Backtest en periodo TEST (datos no vistos) muestra profit factor > 1.0
+- [ ] Backtest en periodo TRAIN muestra profit factor >= 1.10
+- [ ] Backtest en periodo VALIDATION muestra profit factor >= 1.10
+- [ ] Backtest en periodo FINAL-TEST muestra profit factor >= 1.10
+- [ ] Tengo minimo 100 trades historicos antes de confiar en el backtest
 - [ ] Puedo explicar que es overfitting y como lo mitigo
 - [ ] He probado al menos 3 variaciones de parametros
 - [ ] He documentado resultados de cada variacion
 
 Resultados de backtest:
 
-| Variacion | Train PF | Test PF | Sharpe | Drawdown | Notas |
-|-----------|----------|---------|--------|----------|-------|
-| v1: EMA 20/50, RSI 70 | | | | | |
-| v2: | | | | | |
-| v3: | | | | | |
+| Variacion | Train PF | Validation PF | Final-test PF | Sharpe | Drawdown | Notas |
+|-----------|----------|---------------|---------------|--------|----------|-------|
+| v1: EMA 20/50, RSI 70 | | | | | | |
+| v2: | | | | | | |
+| v3: | | | | | | |
 
 ---
 
@@ -78,17 +80,22 @@ Resultados FreqAI:
 
 ---
 
-## FASE 4: Paper Trading (Semanas 19-24)
+## FASE 4: Paper Trading (Semanas 19-30)
 
 - [ ] Bot corriendo en dry-run 24/7
 - [ ] Semana 1 completada - notas: ___
 - [ ] Semana 2 completada - notas: ___
 - [ ] Semana 3 completada - notas: ___
 - [ ] Semana 4 completada - notas: ___
+- [ ] Semana 5 completada - notas: ___
+- [ ] Semana 6 completada - notas: ___
+- [ ] Semana 7 completada - notas: ___
+- [ ] Semana 8 completada - notas: ___ (minimo para pasar)
+- [ ] Semana 9-12 completadas (ideal para FreqAI)
 - [ ] Rendimiento paper esta dentro del rango del backtest (+-30%)
-- [ ] Drawdown maximo no supera 15-20%
+- [ ] Drawdown maximo no supera 15%
 - [ ] NO modifique la estrategia durante el paper (invalida la prueba)
-- [ ] Diario de trading con 20+ trades documentados
+- [ ] Diario de trading con 50+ trades documentados (ideal 100+)
 
 Metricas paper trading:
 
@@ -98,21 +105,37 @@ Metricas paper trading:
 | 2 | | | | | |
 | 3 | | | | | |
 | 4 | | | | | |
+| 5 | | | | | |
+| 6 | | | | | |
+| 7 | | | | | |
+| 8 | | | | | |
 
 ---
 
-## FASE 5: Trading Real (Semanas 25-30+)
+## FASE 5: Trading Real (Semanas 31+)
 
 - [ ] Deposite $50 USD en Binance (NO $200 de golpe)
 - [ ] API keys configuradas (solo trading, NO retiro)
-- [ ] Protecciones activadas (stoploss, CooldownPeriod, StoplossGuard)
+- [ ] Protecciones activadas (stoploss, CooldownPeriod, StoplossGuard, MaxDrawdown, LowProfitPairs)
 - [ ] Semana 1 real completada
 - [ ] Semana 2 real completada
 - [ ] Semana 3 real completada
 - [ ] Semana 4 real completada
-- [ ] Capital no ha caido mas del 15%
+- [ ] Drawdown mensual no supera 5% (kill-switch del plan)
 - [ ] Resultados reales dentro del rango del paper trading
 - [ ] Decision: escalar a $100 / iterar estrategia / parar
+
+---
+
+## Bloque de decision de descarte
+
+Si se cumple cualquiera de estos puntos, no se itera en caliente: se pausa y se descarta o rediseña.
+
+- [ ] PF < 1.10 en validacion/final-test
+- [ ] Drawdown > 15%
+- [ ] Menos de 100 trades historicos
+- [ ] Solo funciona en un par
+- [ ] Dry-run difiere demasiado del backtest
 
 Metricas trading real:
 

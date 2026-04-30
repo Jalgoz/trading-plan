@@ -1,99 +1,115 @@
-# Algo Trading Bot — Freqtrade + FreqAI (Binance Spot)
+# Algo Trading Bot - Freqtrade + FreqAI (Binance Spot)
 
-Bot de trading algorítmico con Machine Learning para crypto, usando Freqtrade y FreqAI.
+Bot de trading algoritmico con enfoque educativo y validacion por fases.
 
 ## Requisitos previos
 
-- **Docker Desktop** instalado y corriendo
-- **Python 3.10+** (opcional, para notebooks de Fase 2)
-- **Cuenta de Binance** (sin depositar dinero hasta Fase 5)
+- Docker Desktop instalado y corriendo
+- Python 3.10+ (opcional, para notebook de Fase 2)
+- Cuenta de Binance (sin dinero real hasta Fase 5)
 
 ## Estructura del proyecto
 
-```
-algo-trading-bot/
-├── docker-compose.yml              # Orquestación de Freqtrade + FreqUI
+```text
+trading-plan/
+├── ARCHIVOS_CLAVE.md                # Orden sugerido de lectura del proyecto
+├── INSTALL_FREQTRADE.md             # Instalacion y validacion Freqtrade/FreqAI
+├── docker-compose.yml                 # Servicio base de Freqtrade
 ├── config/
-│   ├── config-backtest.json        # Backtesting (Fase 1 y 3)
-│   ├── config-dryrun.json          # Paper trading (Fase 4)
-│   └── config-live.json            # Trading real (Fase 5)
+│   ├── config-backtest.json           # Backtest estrategia baseline (Fase 1)
+│   ├── config-backtest-freqai.json    # Backtest con FreqAI (Fase 3)
+│   ├── config-dryrun.json             # Paper trading (Fase 4)
+│   └── config-live.example.json       # Template para live (Fase 5)
 ├── strategies/
-│   ├── EmaCrossRsi.py              # Fase 1: Estrategia sin ML
-│   └── FreqaiLightgbm.py          # Fase 3: Estrategia con FreqAI
+│   ├── EmaCrossRsi.py                 # Baseline sin ML
+│   └── FreqaiLightgbm.py              # Estrategia con filtro ML
 ├── notebooks/
-│   └── ml_fundamentals.ipynb       # Fase 2: Experimentación ML
+│   └── ml_fundamentals.ipynb          # Fundamentos ML para trading
 ├── scripts/
-│   ├── download_data.ps1           # Descargar datos históricos
-│   ├── backtest.ps1                # Ejecutar backtesting
-│   ├── backtest_freqai.ps1         # Backtesting con FreqAI
-│   ├── dryrun.ps1                  # Iniciar paper trading
-│   └── live.ps1                    # Iniciar trading real
+│   ├── download_data.ps1              # Descarga de datos OHLCV
+│   ├── backtest.ps1                   # Backtest train/validation/final-test
+│   ├── backtest_freqai.ps1            # Backtest FreqAI + resumen
+│   ├── dryrun.ps1                     # Ejecuta paper trading
+│   └── live.ps1                       # Ejecuta live con validaciones estrictas
 ├── progress/
-│   ├── tracker.md                  # Checklist por fase
-│   └── journal.md                  # Diario de trading
-└── user_data/                      # (creado por Freqtrade al iniciar)
-    ├── data/                       # Datos OHLCV descargados
-    ├── models/                     # Modelos FreqAI entrenados
-    └── logs/                       # Logs del bot
+│   ├── tracker.md                     # Checklist por fase
+│   ├── journal.md                     # Diario tecnico de ejecucion
+│   └── reports/                       # Generado al correr backtest_freqai.ps1
+└── user_data/                         # Runtime-generated: datos/modelos/logs/resultados
 ```
 
-## Inicio rápido
+## Inicio rapido (modo seguro, sin dinero real)
 
-### 1. Inicializar Freqtrade user_data
+### 1) Inicializar `user_data`
 
 ```powershell
 docker compose run --rm freqtrade create-userdir --userdir /freqtrade/user_data
 ```
 
-### 2. Descargar datos históricos (1 año, 5 pares)
+### 2) Descargar datos historicos
 
 ```powershell
 .\scripts\download_data.ps1
 ```
 
-### 3. Backtesting de estrategia simple (Fase 1)
+### 3) Backtest baseline (Fase 1)
 
 ```powershell
 .\scripts\backtest.ps1
 ```
 
-### 4. Backtesting con FreqAI (Fase 3)
+### 4) Backtest FreqAI (Fase 3)
 
 ```powershell
 .\scripts\backtest_freqai.ps1
 ```
 
-### 5. Paper trading (Fase 4)
+### 5) Paper trading obligatorio (Fase 4)
 
 ```powershell
 .\scripts\dryrun.ps1
 ```
 
-FreqUI estará disponible en **http://localhost:8080** (user: `freqtrade`, pass: `freqtrade`)
+FreqUI: `http://localhost:8080`
 
-### 6. Trading real (Fase 5 — SOLO después de paper trading exitoso)
+## NO ejecutar live hasta cumplir esto
 
-1. Editar `config/config-live.json` con tus API keys de Binance
-2. Ejecutar:
+- [ ] Dry-run continuo minimo 8 semanas (ideal 12) con el mismo setup
+- [ ] Minimo 50 trades en dry-run (ideal 100+) para tener muestra util
+- [ ] Drawdown controlado (no supera 15%)
+- [ ] Backtest y dry-run convergen (desviacion razonable, sin ruptura estructural)
+- [ ] API de Binance sin permisos de retiro
+- [ ] Telegram activo y alertas funcionando
+
+## LIVE (seccion separada con riesgo real)
+
+> ADVERTENCIA: `scripts/live.ps1` mueve dinero real. No es parte del flujo rapido normal.
+
+1. Copiar `config/config-live.example.json` a `config/config-live.json`
+2. Completar credenciales y secretos reales
+3. Validar checklist anterior
+4. Ejecutar:
+
 ```powershell
 .\scripts\live.ps1
 ```
 
-## Fases del plan
+## Fases unificadas del plan
 
-| Fase | Duración | Descripción |
-|------|----------|-------------|
-| 0 | 3 sem | Fundamentos de trading (estudio, no código) |
-| 1 | 4 sem | Freqtrade + estrategia EMA/RSI sin ML |
-| 2 | 5 sem | Aprender ML desde cero |
-| 3 | 6 sem | FreqAI — ML integrado en Freqtrade |
-| 4 | 6 sem | Paper trading en vivo (dry-run) |
-| 5 | 6+ sem | Trading real con micro-capital |
+| Fase | Duracion | Objetivo |
+|------|----------|----------|
+| 0 | 3 semanas | Fundamentos de trading y riesgo (sin codigo) |
+| 1 | 4 semanas | Baseline sin ML en Freqtrade |
+| 2 | 5 semanas | Fundamentos de ML y validacion temporal |
+| 3 | 6 semanas | FreqAI + comparacion contra baseline |
+| 4 | 8-12 semanas | Paper trading (dry-run) con reglas duras |
+| 5 | 6+ semanas | Trading real con micro-capital y apagado automatico |
 
-Consulta `progress/tracker.md` para el checklist detallado por fase.
+Consulta `plan.md` y `progress/tracker.md` para criterios de paso y descarte.
+Para recorrido de lectura sugerido, revisa `ARCHIVOS_CLAVE.md`.
 
 ## Notas de seguridad
 
-- **NUNCA** subas API keys a Git. El `.gitignore` ya excluye `config-live.json`.
-- Las API keys de Binance deben tener **solo permisos de trading**, NO de retiro.
-- Empieza con **$50 USD**, no los $200 completos.
+- Nunca subas API keys a Git (`config/config-live.json` esta ignorado).
+- API keys de Binance: solo trading, sin retiro.
+- Empezar con $50-$100; el objetivo inicial es validar ejecucion real, no rentabilidad.

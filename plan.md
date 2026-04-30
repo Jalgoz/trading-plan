@@ -1,152 +1,208 @@
 # Plan de Aprendizaje y Ejecucion: Bot de Algo Trading con ML (Freqtrade + FreqAI)
 
-Plan progresivo y realista para un ingeniero en sistemas con Python y Docker, sin experiencia en trading ni ML, con $200 USD de capital y 1-2 horas diarias disponibles. Exchange: Binance. Spot primero, futuros despues.
+Plan progresivo para un ingeniero con Python/Docker, sin experiencia previa en trading o ML, con $200 USD y 1-2 horas diarias. Exchange: Binance Spot.
+
+Futuros no forman parte de la ruta normal: quedan fuera de alcance hasta acumular 6-12 meses rentables y auditables en spot.
 
 ---
 
 ## Disclaimer brutal
 
-- **Con $200 USD en spot, si logras un 5% mensual consistente despues de meses de trabajo, estarias entre los mejores.** Eso es $10/mes. No vas a vivir de esto al inicio.
-- **El 70-90% de traders retail pierden dinero.** Un bot no te exime de esto automaticamente.
-- **ML en trading NO es una varita magica.** La mayoria de modelos ML aplicados ingenuamente a precios tienen performance peor que buy-and-hold.
-- **Tu ventaja real no es el bot, es el proceso:** backtesting riguroso, gestion de riesgo, y disciplina para no operar hasta tener evidencia estadistica.
-- **Tiempo total estimado hasta operar con dinero real con un minimo de confianza: 4-6 meses** (a 1-2h/dia).
+- Con $200 USD en spot, incluso 5% mensual consistente son ~$10/mes.
+- 70-90% de traders retail pierden dinero.
+- ML en trading no es magia; puede rendir peor que buy-and-hold.
+- Tu ventaja es el proceso: validacion estadistica, control de riesgo y disciplina.
+- Tiempo estimado razonable para llegar a live: 7-9 meses (no 4 semanas de prueba).
 
 ---
 
-## FASE 0: Fundamentos de Trading y Mercados (Semanas 1-3)
+## Criterios duros de descarte (aplican en todas las fases)
 
-### Objetivo
-Entender como funcionan los mercados crypto, la terminologia, y los mecanismos basicos antes de tocar una sola linea de codigo.
+Si se cumple uno de estos puntos, la idea/estrategia se descarta o vuelve a iteracion:
 
-### Tareas concretas
-1. **Leer y estudiar (no ver videos motivacionales):**
-   - Que es un order book, bid/ask spread, slippage, market vs limit orders
-   - Que son velas japonesas (OHLCV), timeframes (1m, 5m, 1h, 1d)
-   - Indicadores tecnicos basicos: RSI, EMA, MACD, Bollinger Bands - que miden, no como tradear con ellos
-   - Que son las comisiones de Binance (maker/taker: 0.1% spot) y como impactan tu P&L
-   - Conceptos: drawdown, sharpe ratio, win rate, profit factor, risk/reward ratio
-2. **Crear cuenta en Binance** y familiarizarte con la interfaz (NO depositar dinero aun)
-3. **Paper trading manual:** abre TradingView (gratis), pon BTC/USDT en 1h, y anota en un cuaderno 10 trades ficticios con entrada, salida, razon, y resultado. Esto te dara intuicion.
-
-### Herramientas
-| Herramienta | Costo | Uso |
-|---|---|---|
-| TradingView (https://tradingview.com) | Gratis (plan basico) | Graficos, analisis visual |
-| Binance Academy (https://academy.binance.com) | Gratis | Conceptos de trading y crypto |
-| Investopedia (https://investopedia.com) | Gratis | Definiciones y conceptos financieros |
-| babypips.com (https://babypips.com) School of Pipsology | Gratis | Curso estructurado de trading |
-
-### Errores comunes
-- **Saltarte esta fase** porque "ya quieres programar". Sin esto, tu bot sera una caja negra que no puedes evaluar.
-- **Confundir indicadores con estrategias.** RSI > 70 no es una estrategia; es un dato.
-- **Ver YouTube de "traders" que venden cursos.** La mayoria son charlatanes.
-
-### Meta de salida (no avanzar sin cumplir)
-- [ ] Puedes explicar: order book, spread, slippage, maker/taker fees
-- [ ] Puedes leer un grafico de velas y nombrar los indicadores principales
-- [ ] Tienes 10+ trades ficticios anotados con analisis
-- [ ] Puedes calcular breakeven considerando comisiones
+- Profit Factor < 1.10 en validacion o final-test
+- Drawdown maximo > 15%
+- Menos de 100 trades historicos en el periodo evaluado
+- Solo funciona en un par y falla en el resto
+- Dry-run difiere demasiado del backtest (estructura de resultados inconsistente)
 
 ---
 
-## FASE 1: Setup tecnico de Freqtrade + primera estrategia sin ML (Semanas 4-7)
+## FASE 0: Fundamentos de Trading y Riesgo (Semanas 1-3)
 
 ### Objetivo
-Tener Freqtrade corriendo en Docker, entender su arquitectura, y crear/backtestear una estrategia simple.
+Entender mercado, ejecucion y riesgo antes de escribir estrategia.
 
 ### Tareas concretas
-1. Instalar Freqtrade con Docker (ver docker-compose.yml)
-2. Descargar datos historicos (ver scripts/download_data.ps1)
-3. Estudiar la estrategia EmaCrossRsi.py linea por linea
-4. Backtestear con scripts/backtest.ps1
-5. Iterar: cambiar parametros, probar en distintos timeranges
+1. Estudiar: order book, spread, slippage, market/limit, comisiones.
+2. Estudiar: OHLCV, timeframes, drawdown, sharpe, profit factor, expectativa.
+3. Crear cuenta en Binance sin depositar.
+4. Hacer 10+ trades manuales ficticios y documentar razonamiento.
 
 ### Archivos del proyecto relevantes
-- docker-compose.yml - Orquestacion Docker
-- config/config-backtest.json - Configuracion de backtesting
-- strategies/EmaCrossRsi.py - Estrategia EMA Cross + RSI
-- scripts/download_data.ps1 - Descarga de datos
-- scripts/backtest.ps1 - Ejecucion de backtesting
+- `plan.md` - Marco general de fases, criterios y tiempos.
+- `progress/tracker.md` - Checklist operativo por fase.
+- `progress/journal.md` - Registro de aprendizaje y errores.
+
+### Errores comunes
+- Saltar esta fase por querer programar rapido.
+- Confundir indicador con estrategia completa.
+- Ignorar costos de ejecucion (fee, spread, slippage).
 
 ### Meta de salida
-- [ ] Freqtrade corre en Docker sin errores
-- [ ] Has descargado al menos 1 anio de datos OHLCV de 3+ pares
-- [ ] Tu estrategia ejecuta un backtest completo
-- [ ] Profit factor > 1.0 en datos de validacion
-- [ ] Puedes explicar que es overfitting y como lo mitigas
+- [ ] Puedes explicar costos reales de ejecucion
+- [ ] Puedes calcular breakeven con fees
+- [ ] Tienes 10+ ejemplos documentados
+
+---
+
+## FASE 1: Baseline sin ML en Freqtrade (Semanas 4-7)
+
+### Objetivo
+Tener una baseline reproducible con Freqtrade para comparar todo lo demas.
+
+### Tareas concretas
+1. Correr Freqtrade en Docker.
+2. Descargar datos historicos suficientes.
+3. Auditar y entender `EmaCrossRsi.py` como benchmark educativo.
+4. Ejecutar backtest con split `train / validation / final-test`.
+5. Registrar resultados por corrida.
+
+### Archivos del proyecto relevantes
+- `docker-compose.yml` - Ejecucion base de Freqtrade.
+- `config/config-backtest.json` - Parametros de backtesting baseline.
+- `strategies/EmaCrossRsi.py` - Estrategia baseline educativa.
+- `scripts/download_data.ps1` - Descarga OHLCV.
+- `scripts/backtest.ps1` - Backtest train/validation/final-test.
+
+### Errores comunes
+- Optimizar en train y "creer" sin final-test.
+- Usar muestra chica de trades (<100).
+- Cambiar muchas variables a la vez y perder trazabilidad.
+
+### Meta de salida
+- [ ] Backtests reproducibles sin errores
+- [ ] PF >= 1.10 en validation y final-test
+- [ ] Drawdown <= 15%
+- [ ] 100+ trades historicos
 
 ---
 
 ## FASE 2: Fundamentos de ML para Trading (Semanas 8-12)
 
 ### Objetivo
-Aprender Machine Learning suficiente para usarlo con criterio en trading.
+Aprender ML suficiente para no caer en overfitting o validaciones falsas.
 
 ### Tareas concretas
-1. Curso practico de ML: fast.ai o Kaggle Learn
-2. Dominar: walk-forward validation, feature engineering, LightGBM
-3. Completar notebooks/ml_fundamentals.ipynb
+1. Curso practico (fast.ai o Kaggle Learn).
+2. Dominar walk-forward y leakage/look-ahead bias.
+3. Completar `notebooks/ml_fundamentals.ipynb` con datos reales de Freqtrade.
 
 ### Archivos del proyecto relevantes
-- notebooks/ml_fundamentals.ipynb - Notebook guiado de ML
+- `notebooks/ml_fundamentals.ipynb` - Practica guiada de ML para trading.
+- `progress/journal.md` - Registro de hipotesis, resultados y decisiones.
+
+### Errores comunes
+- Basarse solo en accuracy para validar un modelo.
+- Usar datos sinteticos como validacion principal.
+- Hacer random split en series temporales.
 
 ### Meta de salida
-- [ ] Curso de ML completado (ejecutando codigo, no solo viendo)
-- [ ] Notebook funcional con walk-forward split
-- [ ] Entiendes que ~50% accuracy es normal
+- [ ] Notebook ejecutado con datos reales
+- [ ] Entiendes distribucion de labels
+- [ ] Aceptas que accuracy sola no valida estrategia
 
 ---
 
-## FASE 3: FreqAI - ML integrado en Freqtrade (Semanas 13-18)
+## FASE 3: FreqAI integrado (Semanas 13-18)
 
 ### Objetivo
-Integrar ML en Freqtrade usando FreqAI y backtestear estrategias ML-based.
+Usar ML como filtro de señal, no como reemplazo ciego de logica tecnica.
 
 ### Tareas concretas
-1. Estudiar documentacion FreqAI
-2. Configurar FreqAI con LightGBM (ver config-backtest-freqai.json)
-3. Backtestear con scripts/backtest_freqai.ps1
-4. Comparar ML vs estrategia simple
+1. Validar estrategia FreqAI con la version exacta instalada.
+2. Usar pipeline oficial de features (`%`) y targets (`&`).
+3. Probar 2+ configuraciones y cambiar `identifier` por experimento.
+4. Comparar contra baseline sin ML con metricas de trading.
 
 ### Archivos del proyecto relevantes
-- config/config-backtest-freqai.json - Config FreqAI con LightGBM
-- strategies/FreqaiLightgbm.py - Estrategia ML
-- scripts/backtest_freqai.ps1 - Backtest con FreqAI
+- `strategies/FreqaiLightgbm.py` - Estrategia ML con filtro tecnico.
+- `config/config-backtest-freqai.json` - Configuracion FreqAI y entrenamiento.
+- `scripts/backtest_freqai.ps1` - Backtest ML + comparacion baseline.
+- `progress/reports/` - Resumenes por corrida ML vs baseline; se genera automaticamente al correr `scripts/backtest_freqai.ps1`.
+
+### Errores comunes
+- No cambiar `identifier` entre experimentos.
+- Usar ML como senal unica sin filtro tecnico.
+- No revisar distribucion de labels y degeneracion de clase.
 
 ### Meta de salida
-- [ ] FreqAI corre backtest sin errores
-- [ ] 2+ configuraciones probadas
-- [ ] Comparacion ML vs simple documentada
+- [ ] ML mejora algo medible (PF, DD, expectativa o calidad de trades)
+- [ ] Hay resumen ML vs baseline por corrida
+- [ ] No hay evidencia de sobreoptimizacion en validacion/final-test
 
 ---
 
-## FASE 4: Paper Trading (Semanas 19-24)
+## FASE 4: Paper Trading (Semanas 19-30)
+
+### Regla principal
+Minimo 8 semanas continuas; ideal 12 semanas. Cuatro semanas es un minimo tecnico, no criterio suficiente para pasar a dinero real.
 
 ### Tareas
-1. Configurar dry-run (ver config/config-dryrun.json)
-2. Ejecutar scripts/dryrun.ps1
-3. Monitorear en FreqUI (http://localhost:8080)
-4. 4+ semanas minimo
+1. Configurar dry-run con protecciones activas.
+2. Ejecutar `scripts/dryrun.ps1` y monitorear diario.
+3. No cambiar estrategia durante el periodo de evaluacion.
+4. Validar convergencia con backtest.
 
 ### Archivos del proyecto relevantes
-- config/config-dryrun.json - Config paper trading
-- scripts/dryrun.ps1 - Iniciar paper trading
-- progress/journal.md - Diario de trading
+- `config/config-dryrun.json` - Configuracion de paper trading.
+- `scripts/dryrun.ps1` - Arranque y validaciones previas.
+- `progress/journal.md` - Bitacora de ejecucion diaria.
+- `progress/tracker.md` - Control de avance semanal.
+
+### Errores comunes
+- Quedarse en 2-4 semanas y pasar a live prematuramente.
+- Modificar estrategia durante la prueba y contaminar resultados.
+- Ignorar divergencias entre dry-run y backtest.
+
+### Meta de salida
+- [ ] 8-12 semanas completadas
+- [ ] Minimo 50 trades (ideal 100+)
+- [ ] Drawdown controlado <= 15%
+- [ ] Backtest y dry-run son consistentes
 
 ---
 
-## FASE 5: Trading Real (Semanas 25-30+)
+## FASE 5: Trading Real con micro-capital (Semanas 31+)
 
-### Tareas
-1. Copiar config-live.example.json a config-live.json
-2. Agregar API keys de Binance
-3. Ejecutar scripts/live.ps1
-4. Empezar con $50, NO $200
+### Objetivo
+Validar ejecucion real (ordenes, fees, slippage, latencia), no maximizar rentabilidad inmediata.
+
+### Capital real esperado
+
+- Inicio sugerido: $50 o $100.
+- $200 completo solo despues de estabilidad comprobada.
+- Meta inicial: confiabilidad operativa y control de riesgo.
+
+### Reglas de apagado (kill switch)
+
+Parar live y volver a Fase 3/4 si ocurre cualquiera:
+
+- Drawdown mensual > 5%
+- 5 perdidas consecutivas
+- Divergencia marcada live vs dry-run
+- Modelo predice casi siempre la misma clase
+- Errores repetidos de exchange/API
 
 ### Archivos del proyecto relevantes
-- config/config-live.example.json - Template para trading real
-- scripts/live.ps1 - Iniciar trading real (con confirmacion)
+- `config/config-live.example.json` - Plantilla de live con protecciones.
+- `scripts/live.ps1` - Validaciones estrictas antes de operar.
+- `progress/journal.md` - Auditoria de cada trade real.
+
+### Errores comunes
+- Entrar con capital completo desde el primer dia.
+- Operar sin alertas activas (Telegram) y sin monitoreo.
+- Ignorar reglas de apagado por sesgo emocional.
 
 ---
 
@@ -160,18 +216,18 @@ Integrar ML en Freqtrade usando FreqAI y backtestear estrategias ML-based.
 | Muy bueno | +5% a +10% |
 | Fantasia | +20%+ |
 
-Con $200 y +3% mensual = ~$6/mes. No es para vivir de esto al inicio.
+Con $200 y +3% mensual son ~$6/mes. Al inicio la prioridad es proceso, no ingreso.
 
 ---
 
-## Timeline
+## Timeline unificado
 
-| Fase | Duracion | Horas |
+| Fase | Duracion | Horas estimadas |
 |---|---|---|
 | Fase 0 | 3 semanas | 20-40h |
 | Fase 1 | 4 semanas | 30-50h |
 | Fase 2 | 5 semanas | 40-60h |
 | Fase 3 | 6 semanas | 50-70h |
-| Fase 4 | 6 semanas | 15-25h |
-| Fase 5 | 6+ semanas | 15-25h |
-| TOTAL | ~30 semanas | ~170-270h |
+| Fase 4 | 8-12 semanas | 25-45h + monitoreo |
+| Fase 5 | 6+ semanas | 20-40h + monitoreo |
+| TOTAL | ~32-36 semanas | ~185-305h |
