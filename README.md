@@ -1,4 +1,4 @@
-# Algo Trading Bot - Freqtrade + FreqAI (Binance Spot)
+# Trading Bot - Freqtrade + FreqAI (Binance Spot)
 
 Bot de trading algoritmico con enfoque educativo y validacion por fases.
 
