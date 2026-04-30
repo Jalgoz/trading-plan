@@ -5,7 +5,8 @@
     "max_open_trades": 2,
     "stake_currency": "USDT",
     "stake_amount": 20,
-    "tradable_balance_ratio": 0.99,
+    "tradable_balance_ratio": 0.9,
+    "fee": 0.001,
     "fiat_display_currency": "USD",
     "dry_run": false,
     "cancel_open_orders_on_exit": true,
@@ -49,7 +50,7 @@
         }
     ],
     "telegram": {
-        "enabled": false,
+        "enabled": true,
         "token": "TU_TELEGRAM_BOT_TOKEN",
         "chat_id": "TU_CHAT_ID",
         "notification_settings": {
@@ -78,18 +79,51 @@
     "internals": {
         "process_throttle_secs": 5
     },
-    "protections": [
-        {
-            "method": "CooldownPeriod",
-            "stop_duration_candles": 2
+    "freqai": {
+        "enabled": true,
+        "purge_old_models": 2,
+        "train_period_days": 90,
+        "backtest_period_days": 7,
+        "live_retrain_hours": 168,
+        "identifier": "lightgbm_live_v1",
+        "feature_parameters": {
+            "include_timeframes": [
+                "1h",
+                "4h"
+            ],
+            "include_corr_pairlist": [
+                "BTC/USDT",
+                "ETH/USDT"
+            ],
+            "indicator_periods_candles": [
+                10,
+                20,
+                50
+            ],
+            "label_period_candles": 4,
+            "include_shifted_candles": 2,
+            "DI_threshold": 0.9,
+            "weight_factor": 0.9,
+            "principal_component_analysis": false,
+            "use_SVM_to_remove_outliers": true,
+            "svm_params": {
+                "shuffle": false,
+                "nu": 0.01
+            }
         },
-        {
-            "method": "StoplossGuard",
-            "trade_limit": 3,
-            "lookback_period_candles": 24,
-            "stop_duration_candles": 12
+        "data_split_parameters": {
+            "test_size": 0.33,
+            "random_state": 1,
+            "shuffle": false
+        },
+        "model_training_parameters": {
+            "n_estimators": 400,
+            "max_depth": 6,
+            "learning_rate": 0.02,
+            "num_leaves": 31,
+            "min_child_samples": 20
         }
-    ],
+    },
     "dataformat_ohlcv": "feather",
     "dataformat_trades": "feather"
 }

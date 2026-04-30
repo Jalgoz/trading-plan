@@ -3,8 +3,9 @@
     "margin_mode": "",
     "max_open_trades": 3,
     "stake_currency": "USDT",
-    "stake_amount": "unlimited",
-    "tradable_balance_ratio": 0.99,
+    "stake_amount": 20,
+    "tradable_balance_ratio": 0.9,
+    "fee": 0.001,
     "fiat_display_currency": "USD",
     "dry_run": true,
     "dry_run_wallet": 200,
@@ -53,8 +54,8 @@
         "purge_old_models": 2,
         "train_period_days": 90,
         "backtest_period_days": 7,
-        "live_retrain_period": 7,
-        "identifier": "lightgbm_v1",
+        "live_retrain_hours": 168,
+        "identifier": "lightgbm_bt_v1",
         "feature_parameters": {
             "include_timeframes": [
                 "1h",
