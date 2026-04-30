@@ -1,28 +1,84 @@
-# download_data.ps1 — Descarga datos históricos OHLCV de Binance
-# Uso: .\scripts\download_data.ps1
-# Descarga 1 año de datos en timeframes 1h y 4h para 5 pares principales
+<#
+.SYNOPSIS
+Descarga datos OHLCV historicos desde Binance usando Freqtrade.
 
-$pairs = "BTC/USDT ETH/USDT SOL/USDT BNB/USDT XRP/USDT"
-$timeframes = "1h 4h"
-$days = 730  # 2 años de datos (más datos = mejor backtest)
+.DESCRIPTION
+Este script prepara datos para backtesting baseline y FreqAI.
+Permite dos modos de rango temporal:
+1) Por cantidad de dias (--days).
+2) Por timerange explicito (--timerange YYYYMMDD-YYYYMMDD).
 
+.PARAMETER Pairs
+Lista de pares a descargar (formato EXCHANGE/QUOTE, por ejemplo BTC/USDT).
+
+.PARAMETER Timeframes
+Lista de timeframes a descargar (por ejemplo 1h, 4h).
+
+.PARAMETER Days
+Cantidad de dias historicos cuando no se usa -Timerange.
+
+.PARAMETER Timerange
+Rango explicito para descarga. Si se define, tiene prioridad sobre -Days.
+
+.EXAMPLE
+.\scripts\download_data.ps1
+
+.EXAMPLE
+.\scripts\download_data.ps1 -Days 1000
+
+.EXAMPLE
+.\scripts\download_data.ps1 -Pairs BTC/USDT,ETH/USDT -Timeframes 1h -Timerange "20220101-20260101"
+
+.NOTES
+Para FreqAI, conviene descargar velas extra antes del timerange objetivo para cubrir
+train_period_days + startup_candle_count.
+#>
+
+param(
+    [string[]]$Pairs = @("BTC/USDT", "ETH/USDT", "SOL/USDT"),
+    [string[]]$Timeframes = @("1h", "4h"),
+    [int]$Days = 730,
+    [string]$Timerange = ""
+)
+
+# --- Logging de parametros de ejecucion ---
 Write-Host "Descargando datos historicos de Binance..." -ForegroundColor Cyan
-Write-Host "Pares: $pairs" -ForegroundColor Yellow
-Write-Host "Timeframes: $timeframes" -ForegroundColor Yellow
-Write-Host "Dias: $days" -ForegroundColor Yellow
+Write-Host "Pares: $($Pairs -join ', ')" -ForegroundColor Yellow
+Write-Host "Timeframes: $($Timeframes -join ', ')" -ForegroundColor Yellow
+
+if ([string]::IsNullOrWhiteSpace($Timerange)) {
+    Write-Host "Modo: dias -> $Days" -ForegroundColor Yellow
+} else {
+    Write-Host "Modo: timerange -> $Timerange" -ForegroundColor Yellow
+    Write-Host "Tip FreqAI: descarga datos extra antes del timerange para train_period_days + startup_candle_count." -ForegroundColor DarkYellow
+}
 Write-Host ""
 
-docker compose run --rm freqtrade download-data `
-    --config /freqtrade/config/config-backtest.json `
-    --exchange binance `
-    --pairs $pairs.Split(" ") `
-    --timeframes $timeframes.Split(" ") `
-    --days $days `
-    --dataformat-ohlcv feather
+$args = @(
+    "compose", "run", "--rm", "freqtrade", "download-data",
+    "--config", "/freqtrade/config/config-backtest.json",
+    "--exchange", "binance",
+    "--pairs"
+) + $Pairs + @(
+    "--timeframes"
+) + $Timeframes
 
+if ([string]::IsNullOrWhiteSpace($Timerange)) {
+    $args += @("--days", "$Days")
+} else {
+    $args += @("--timerange", $Timerange)
+}
+
+$args += @("--dataformat-ohlcv", "feather")
+
+# --- Ejecucion principal ---
+& docker @args
+
+# --- Manejo de resultado ---
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "`nDatos descargados exitosamente!" -ForegroundColor Green
+    Write-Host "`nDatos descargados exitosamente." -ForegroundColor Green
     Write-Host "Ubicacion: user_data/data/binance/" -ForegroundColor Gray
 } else {
-    Write-Host "`nError al descargar datos. Verifica que Docker este corriendo." -ForegroundColor Red
+    Write-Host "`nError al descargar datos. Verifica Docker y parametros." -ForegroundColor Red
+    exit 1
 }
