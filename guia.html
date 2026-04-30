@@ -83,14 +83,20 @@
       -webkit-text-fill-color: transparent;
       position: relative;
       margin-bottom: 0.5rem;
-      display: none;
+    }
+
+    .hero-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      position: relative;
     }
 
     .logo-inline {
-      display: block;
-      margin: 0 auto 1rem;
-      width: 64px;
-      height: 64px;
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
     }
 
     .hero p {
@@ -1150,14 +1156,16 @@
 
   <!-- ===== HERO ===== -->
   <div class="hero">
-    <svg class="logo-inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-      <rect width="64" height="64" rx="12" fill="#0f1117"/>
-      <path d="M12 42 L22 28 L32 35 L42 18 L52 25" stroke="#58a6ff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="52" cy="25" r="5" fill="#3fb950"/>
-      <path d="M12 50 L52 50" stroke="#30363d" stroke-width="2" stroke-linecap="round"/>
-      <path d="M12 42 L52 42" stroke="#30363d" stroke-width="1.5" stroke-dasharray="3,3" stroke-linecap="round"/>
-    </svg>
-    <h1>Trading Bot</h1>
+    <div class="hero-title-row">
+      <svg class="logo-inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+        <rect width="64" height="64" rx="12" fill="#0f1117"/>
+        <path d="M12 42 L22 28 L32 35 L42 18 L52 25" stroke="#58a6ff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="52" cy="25" r="5" fill="#3fb950"/>
+        <path d="M12 50 L52 50" stroke="#30363d" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 42 L52 42" stroke="#30363d" stroke-width="1.5" stroke-dasharray="3,3" stroke-linecap="round"/>
+      </svg>
+      <h1>Trading Bot</h1>
+    </div>
     <p>Plan de aprendizaje y ejecución progresivo: Freqtrade + FreqAI + Binance</p>
     <div class="hero-stats">
       <div class="hero-stat">
